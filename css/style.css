@@ -244,6 +244,7 @@ table.table .avatar {
 .modal .modal-footer {
     background: #ecf0f1;
     border-radius: 0 0 3px 3px;
+    text-align: center;
 }
 
 .modal .modal-title {
