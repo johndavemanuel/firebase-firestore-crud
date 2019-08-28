@@ -217,7 +217,6 @@ $(document).ready(function () {
 });
 (function ($) {
     "use strict";
-
     function centerModal() {
         $(this).css('display', 'block');
         var $dialog = $(this).find(".modal-dialog"),
