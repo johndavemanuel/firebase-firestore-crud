@@ -1,4 +1,4 @@
-# Firebase Firestore Crud
+# Firebase Firestore CRUD
 A dead simple CRUD app using Bootstrap and Firebase
 
 
