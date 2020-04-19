@@ -1,9 +1,10 @@
 $(document).ready(function () {
+    const employeeRef = db.collection("employees");
     let deleteIDs = [];
-    let lastVisible;
-    let firstVisible;
-    // REAL TIME LISTENER
-    db.collection('employees').onSnapshot(snapshot => {
+    let lastVisibleEmployeeSnapShot = {};
+
+    // GET TOTAL SIZE
+    employeeRef.onSnapshot(snapshot => {
         let size = snapshot.size;
         $('.count').text(size);
         if (size == 0) {
@@ -11,6 +12,11 @@ $(document).ready(function () {
         } else {
             $('#selectAll').attr('disabled', false);
         }
+    });
+
+
+    // REAL TIME LISTENER
+    employeeRef.limit(2).onSnapshot(snapshot => {
         let changes = snapshot.docChanges();
         changes.forEach(change => {
             if (change.type == 'added') {
@@ -22,6 +28,7 @@ $(document).ready(function () {
                 $('tr[data-id=' + change.doc.id + ']').remove();
             }
         });
+        lastVisibleEmployeeSnapShot = snapshot.docs[snapshot.docs.length - 1];
     });
 
     // db.collection('employees').startAt("abc").endAt("abc\uf8ff").get()
@@ -34,6 +41,7 @@ $(document).ready(function () {
     // db.collection('employees').startAt('bos').endAt('bos\uf8ff').on("value", function(snapshot) {
     //     console.log(snapshot);
     // });
+
     // var first = db.collection("employees")
     //     .limit(3);
 
@@ -42,10 +50,9 @@ $(document).ready(function () {
     //         renderEmployee(doc);
     //     });
     //     lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-    //     console.log(documentSnapshots.docs.length - 1);
     // });
 
-
+    // DISPLAY
     function renderEmployee(document) {
         let item = `<tr data-id="${document.id}">
         <td>
@@ -181,42 +188,44 @@ $(document).ready(function () {
     });
 
     // PAGINATION
-    $("#js-previous").on('click', function () {
+    $("#js-previous").on('click', function (e) {
+        e.preventDefault();
         $('#employee-table tbody').html('');
-        var previous = db.collection("employees")
-            .orderBy(firebase.firestore.FieldPath.documentId(), "desc")
-            .startAt(firstVisible)
-            .limit(3);
-        previous.get().then(function (documentSnapshots) {
-            documentSnapshots.docs.forEach(doc => {
-                renderEmployee(doc);
-            });
+        const query = employeeRef
+          .endBefore(lastVisibleEmployeeSnapShot)
+          .limit(2);
+
+        query.get().then(snap => {
+          snap.forEach(doc => {
+            renderEmployee(doc);
+          });
+          lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
         });
     });
 
-    $('#js-next').on('click', function () {
+    $('#js-next').on('click', function (e) {
+        e.preventDefault();
         if ($(this).closest('.page-item').hasClass('disabled')) {
             return false;
         }
         $('#employee-table tbody').html('');
-        var next = db.collection("employees")
-            .startAfter(lastVisible)
-            .limit(3);
-        next.get().then(function (documentSnapshots) {
-            documentSnapshots.docs.forEach(doc => {
-                renderEmployee(doc);
-            });
-            lastVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-            firstVisible = documentSnapshots.docs[documentSnapshots.docs.length - 1];
-            let nextChecker = documentSnapshots.docs.length - 1;
-            if (nextChecker == 0) {
-                $('#js-next').closest('.page-item').addClass('disabled');
-            }
+        const query = employeeRef
+          .startAfter(lastVisibleEmployeeSnapShot)
+          .limit(2);
+
+        query.get().then(snap => {
+          snap.forEach(doc => {
+           renderEmployee(doc);
+          });
+         lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
         });
     });
 });
+
+// CENTER MODAL
 (function ($) {
     "use strict";
+
     function centerModal() {
         $(this).css('display', 'block');
         var $dialog = $(this).find(".modal-dialog"),
