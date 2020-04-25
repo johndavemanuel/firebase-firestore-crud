@@ -191,15 +191,15 @@ $(document).ready(function () {
     $("#js-previous").on('click', function (e) {
         e.preventDefault();
         $('#employee-table tbody').html('');
-        const query = employeeRef
-          .endBefore(lastVisibleEmployeeSnapShot)
-          .limit(2);
+        const queryPrevious = employeeRef
+            .endBefore(lastVisibleEmployeeSnapShot)
+            .limit(2);
 
-        query.get().then(snap => {
-          snap.forEach(doc => {
-            renderEmployee(doc);
-          });
-          lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
+        queryPrevious.get().then(snap => {
+            snap.forEach(doc => {
+                renderEmployee(doc);
+            });
+            lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
         });
     });
 
@@ -209,16 +209,29 @@ $(document).ready(function () {
             return false;
         }
         $('#employee-table tbody').html('');
-        const query = employeeRef
-          .startAfter(lastVisibleEmployeeSnapShot)
-          .limit(2);
+        const queryNext = employeeRef
+            .startAfter(lastVisibleEmployeeSnapShot)
+            .limit(2);
 
-        query.get().then(snap => {
-          snap.forEach(doc => {
-           renderEmployee(doc);
-          });
-         lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
+        queryNext.get().then(snap => {
+            snap.forEach(doc => {
+                renderEmployee(doc);
+            });
+            lastVisibleEmployeeSnapShot = snap.docs[snap.docs.length - 1];
         });
+    });
+
+    // SEARCH
+    $("#search-name").keyup(function () {
+        $('#employee-table tbody').html('');
+        let nameKeyword = $("#search-name").val();
+        console.log(nameKeyword);
+        employeeRef.orderByChild("name").startAt(nameKeyword).endAt(nameKeyword+"\uf8ff").get()
+            .then(function (documentSnapshots) {
+                documentSnapshots.docs.forEach(doc => {
+                    renderEmployee(doc);
+                });
+            });
     });
 });
 
