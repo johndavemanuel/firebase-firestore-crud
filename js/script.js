@@ -704,7 +704,8 @@ function addTestData() {
 				name: employee.name,
 				email: employee.email,
 				address: employee.address,
-				phone: employee.phone
+				phone: employee.phone,
+				createdAt : firebase.firestore.FieldValue.serverTimestamp()
 			}).then(function () {
 				console.log("Document successfully written!");
 			})
@@ -713,6 +714,8 @@ function addTestData() {
 			});
 	});
 }
+
+// addTestData();
 
 $(document).ready(function () {
 
@@ -737,7 +740,8 @@ $(document).ready(function () {
 			name: employeeName,
 			email: employeeEmail,
 			address: employeeAddress,
-			phone: employeePhone
+			phone: employeePhone,
+			createdAt : firebase.firestore.FieldValue.serverTimestamp()
 			}).then(function (docRef) {
 				console.log("Document written with ID: ", docRef.id);
 				$("#addEmployeeModal").modal('hide');
@@ -801,7 +805,8 @@ $(document).ready(function () {
 			name: employeeName,
 			email: employeeEmail,
 			address: employeeAddress,
-			phone: employeePhone
+			phone: employeePhone,
+			updatedAt : firebase.firestore.FieldValue.serverTimestamp()
 		});
 
 		$('#editEmployeeModal').modal('hide');
