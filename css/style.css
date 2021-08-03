@@ -269,3 +269,11 @@ table.table .avatar {
 .modal form label {
     font-weight: normal;
 }
+
+#search-name {
+	margin-top: 20px;
+}
+
+.readmore {
+	text-align: center;
+}
