@@ -31,7 +31,8 @@ employeeRef.onSnapshot(snapshot => {
 const displayEmployees = async (doc) => {
 	console.log('displayEmployees');
 
-	let employees = employeeRef.orderBy('name').startAfter(doc || 0).limit(10000);
+	let employees = employeeRef;
+	// .startAfter(doc || 0).limit(10000)
 
 	const data = await employees.get();
 
@@ -84,10 +85,10 @@ const displayEmployees = async (doc) => {
 		});
 	})
 
-	// update latest doc
+	// UPDATE LATEST DOC
 	latestDoc = data.docs[data.docs.length - 1];
 
-	// unattach event listeners if no more docs
+	// UNATTACH EVENT LISTENERS IF NO MORE DOCS
 	if (data.empty) {
 		$('.js-loadmore').hide();
 	}
@@ -728,14 +729,40 @@ $(document).ready(function () {
 	// ADD EMPLOYEE
 	$("#add-employee-form").submit(function (event) {
 		event.preventDefault();
+		let employeeName = $('#employee-name').val();
+		let employeeEmail = $('#employee-email').val();
+		let employeeAddress = $('#employee-address').val();
+		let employeePhone =  $('#employee-phone').val();
 		db.collection('employees').add({
-				name: $('#employee-name').val(),
-				email: $('#employee-email').val(),
-				address: $('#employee-address').val(),
-				phone: $('#employee-phone').val()
-			}).then(function () {
-				console.log("Document successfully written!");
+			name: employeeName,
+			email: employeeEmail,
+			address: employeeAddress,
+			phone: employeePhone
+			}).then(function (docRef) {
+				console.log("Document written with ID: ", docRef.id);
 				$("#addEmployeeModal").modal('hide');
+
+				let newEmployee =
+				`<tr data-id="${docRef.id}">
+						<td>
+								<span class="custom-checkbox">
+										<input type="checkbox" id="${docRef.id}" name="options[]" value="${docRef.id}">
+										<label for="${docRef.id}"></label>
+								</span>
+						</td>
+						<td class="employee-name">${employeeName}</td>
+						<td class="employee-email">${employeeEmail}</td>
+						<td class="employee-address">${employeeAddress}</td>
+						<td class="employee-phone">${employeePhone}</td>
+						<td>
+								<a href="#" id="${docRef.id}" class="edit js-edit-employee"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i>
+								</a>
+								<a href="#" id="${docRef.id}" class="delete js-delete-employee"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i>
+								</a>
+						</td>
+				</tr>`;
+
+			$('#employee-table tbody').prepend(newEmployee);
 			})
 			.catch(function (error) {
 				console.error("Error writing document: ", error);
